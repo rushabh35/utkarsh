@@ -23,10 +23,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   void initState() {
     screens = [
-        HomePage(),
-      NGOSignUp(),
-      NGOSignUp(),
-      NGOSignUp(),
+        const HomePage(),
+      const NGOSignUp(),
+      const NGOSignUp(),
+      const NGOSignUp(),
       // Blog(),
       // HomePage(title: "Her")
     ];
@@ -75,14 +75,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
               // rippleColor: Color.fromARGB(255, 0, 183, 255),
               // hoverColor: Color.fromARGB(255, 38, 141, 132),
               gap: 8,
-              activeColor: Color.fromARGB(255, 0, 0, 0),
+              activeColor: const Color.fromARGB(255, 0, 0, 0),
               iconSize: 24,
 
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              duration: Duration(milliseconds: 400),
-              tabBackgroundColor: Color.fromARGB(255, 143, 143, 143),
-              color: Color.fromARGB(255, 153, 153, 153),
-              tabs: [
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              duration: const Duration(milliseconds: 400),
+              tabBackgroundColor: const Color.fromARGB(255, 143, 143, 143),
+              color: const Color.fromARGB(255, 153, 153, 153),
+              tabs: const [
                 GButton(
                   backgroundColor: Color.fromARGB(255, 236, 153, 236),
                   iconActiveColor: Color.fromARGB(255, 155, 21, 155),

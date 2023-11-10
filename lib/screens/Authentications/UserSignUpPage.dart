@@ -9,7 +9,10 @@ import '../../../../widgets/PasswordTextField.dart';
 import '../../constants/app_constants_colors.dart';
 import '../../utils/ui/CustomBoldText.dart';
 import '../../widgets/LoginTextField.dart';
+import '../Home/Navbar.dart';
 import 'UsersSignIn.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
 
@@ -19,13 +22,51 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  //late File _profileImage; // Store the selected profile image file
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _passWordController = TextEditingController();
   // TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
+  bool _isNGO = false; // A boolean to determine if the user is an NGO.
+
+  // Function to handle the registration process.
+  void _register() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+            email: _emailController.text,
+            password: _passWordController.text);
+        // After successful registration, you can add custom logic based on the user type.
+        // Here, we'll assume you have an 'isNGO' field in the user profile.
+
+        await userCredential.user!.updateDisplayName( _isNGO ? 'NGO' : 'User');
+
+        // You can store additional user data in Firebase Firestore or Realtime Database.
+
+        // Redirect to the dashboard or login page.
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          print('The password provided is too weak.');
+        } else if (e.code == 'email-already-in-use') {
+          print('The account already exists for that email.');
+        }
+        // Handle other FirebaseAuthException errors.
+      } catch (e) {
+        print(e.toString());
+      }
+    }
+  }
+  //late File _profileImage; // Store the selected profile image file
+
   bool _isNotValid = false;
 
+  void dispose() {
+    _passWordController.dispose();
+    _emailController.dispose();
+    _numberController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -73,18 +114,44 @@ class _SignUpPageState extends State<SignUpPage> {
               hintText: 'Email',
               errorText : _isNotValid ? "Enter Email Field" : null,
             ),
-            LoginTextFieldWidget(controller: _numberController, hintText: 'PhoneNumber', keyboardType: TextInputType.number,
-              errorText : _isNotValid ? "Enter Number Field" : null,
-            ),
+            // LoginTextFieldWidget(controller: _numberController, hintText: 'PhoneNumber', keyboardType: TextInputType.number,
+            //   errorText : _isNotValid ? "Enter Number Field" : null,
+            // ),
             PasswordTextField(controller: _passWordController, hintText: 'Password',
               errorText:  _isNotValid ? "Enter Password Field" : null,
             ),
-
+            // Row(
+            //   children: <Widget>[
+            //     Text('Are you an NGO?'),
+            //     Checkbox(
+            //       value: _isNGO,
+            //       onChanged: (bool? value) { // Change the parameter type to bool?
+            //         setState(() {
+            //           _isNGO = value ?? false; // Use the value with a null check
+            //         });
+            //       },
+            //     ),
+            //   ],
+            // ),
 
             CustomButton(
               buttonColor: AppConstantsColors.accentColor,
               text: 'SIGN UP',
               onPressed: ()=> {
+                _register(),
+
+
+
+              // FirebaseAuth.instance.createUserWithEmailAndPassword(email: _emailController.text, password: _passWordController.text)
+              //     .then((value){
+              // print("Created New Account");
+              // Navigator.push(
+              // context,
+              // MaterialPageRoute(builder: (context) => BottomNavBar()),
+              // );
+              // }).onError((error,stackTrace) {
+              // print("Error: ${error.toString()}");
+              // })
                 // registerUser(),
                 // try {
                 //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LandingPage()));

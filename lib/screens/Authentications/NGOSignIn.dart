@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:utkarsh/screens/Authentications/NGOSignUp.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:utkarsh/screens/Home/Navbar.dart';
 import '../../constants/app_constants_colors.dart';
 import '../../utils/ui/ClickableText.dart';
 import '../../utils/ui/CustomBoldText.dart';
@@ -54,6 +55,19 @@ class _NGOSignInState extends State<NGOSignIn> {
 
               text: 'NGO SIGN IN',
               onPressed: () {
+                FirebaseAuth.instance.
+                signInWithEmailAndPassword(
+                    email: _emailController.text,
+                    password: _passWordController.text).
+                then((value){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => BottomNavBar()),
+                  );
+                }).onError((error,stackTrace) {
+                  print("Error ${error.toString()})");
+                });
+
                 // loginUser();
                 // try {
                 //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LandingPage()));

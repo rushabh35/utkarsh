@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:utkarsh/constants/app_constants_colors.dart';
+import 'package:utkarsh/screens/book%20a%20pickup/BookPickup.dart';
 
 import '../../widgets/HomeTileWidgets.dart';
+import '../../widgets/Menubar/MenuBar.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -13,13 +15,49 @@ class HomePage extends StatelessWidget {
     var sizeHeight = size.height;
     var sizeWidth = size.width;
     return Scaffold(
+      drawer: Drawer(
+
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: AppConstantsColors.accentColor,
+              ),
+              child: Text('Drawer Header'),
+            ),
+            ListTile(
+              title: const Text('Book A Pickup'),
+              onTap: () {
+                Navigator
+                    .of(context).push(MaterialPageRoute(
+                    builder: (context) => const BookPickup()
+                )
+                );
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            ListTile(
+              title: const Text('Profile'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
-          clipBehavior: Clip.none,
-          backgroundColor: AppConstantsColors.brightWhiteColor,
-          leading: const Icon(
-            Icons.arrow_back_sharp,
-            color: AppConstantsColors.blackColor,
-          ),
+        iconTheme: IconThemeData(color: Colors.black),
+
+        clipBehavior: Clip.none,
+          backgroundColor: AppConstantsColors.whiteColor,
+          // leading: const Icon(
+          //   Icons.arrow_back_sharp,
+          //   color: AppConstantsColors.blackColor,
+          // ),
           title:  const Text('Utkarsh',
             style: TextStyle(
               color: AppConstantsColors.blackColor,

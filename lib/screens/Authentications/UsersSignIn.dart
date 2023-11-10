@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../constants/app_constants_colors.dart';
 import '../../utils/ui/ClickableText.dart';
 import '../../utils/ui/CustomBoldText.dart';
@@ -11,7 +11,6 @@ import '../Home/Navbar.dart';
 import 'UserSignUpPage.dart';
 
 class UserSignIn extends StatefulWidget {
-
   const UserSignIn({Key? key}) : super(key: key);
 
   @override
@@ -40,23 +39,43 @@ class _UserSignInState extends State<UserSignIn> {
             CustomBoldText(
               text: 'Sign in with password',
               fontSize: sizeHeight * 0.06,
-              textColor: AppConstantsColors.accentColor   ,
+              textColor: AppConstantsColors.accentColor,
             ),
 
             LoginTextFieldWidget(
-              controller: _emailController, hintText: 'Email', errorText : _isNotValid ? "Enter Email Field" : null,),
+              controller: _emailController,
+              hintText: 'Email',
+              errorText: _isNotValid ? "Enter Email Field" : null,
+            ),
 
-            PasswordTextField(controller: _passWordController, hintText: 'Password', errorText : _isNotValid ? "Enter password Field" : null,),
-
+            PasswordTextField(
+              controller: _passWordController,
+              hintText: 'Password',
+              errorText: _isNotValid ? "Enter password Field" : null,
+            ),
 
             CustomButton(
               buttonColor: AppConstantsColors.accentColor,
-
               text: 'SIGN IN',
               onPressed: () {
                 // loginUser();
+                FirebaseAuth.instance
+                    .signInWithEmailAndPassword(
+                        email: _emailController.text,
+                        password: _passWordController.text
+                        )
+                    .then((value) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => BottomNavBar()),
+                  );
+                }).onError((error, stackTrace) {
+                  print("Error ${error.toString()})");
+                });
+
                 try {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  BottomNavBar()));
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => BottomNavBar()));
                 } catch (e) {
                   print("Navigation error: $e");
                 }
@@ -89,27 +108,19 @@ class _UserSignInState extends State<UserSignIn> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const CustomTextWidget(
-                  text: 'Dont have an account? ',
-                  textColor: AppConstantsColors.blackColor
-
-                ),
+                    text: 'Dont have an account? ',
+                    textColor: AppConstantsColors.blackColor),
                 ClickableText(
-                  text : 'Sign Up',
-                  textColor : AppConstantsColors.redColor,
-                  fontSize : 14,
+                  text: 'Sign Up',
+                  textColor: AppConstantsColors.redColor,
+                  fontSize: 14,
                   onPressed: () {
-                    Navigator
-                        .of(context).push(MaterialPageRoute(
-                        builder: (context) => const SignUpPage()
-                          )
-                    );
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const SignUpPage()));
                   },
                 )
               ],
             )
-
-
-
           ],
         ),
       ),
