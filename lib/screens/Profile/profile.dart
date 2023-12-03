@@ -1,8 +1,9 @@
 // ignore_for_file: unnecessary_null_comparison
 
 import 'dart:io';
-
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:utkarsh/models/userModel.dart';
 import 'package:utkarsh/repository/UserRepository.dart';
 import 'package:utkarsh/utils/ui/CustomButton.dart';
@@ -11,13 +12,12 @@ import '../../constants/app_constants_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-
 class ProfileScreen extends StatefulWidget {
   final String? loggedInEmail;
-  final String? name;
-  final String? phoneNumber;
 
-  const ProfileScreen({Key? key, required this.loggedInEmail, required this.name, required this.phoneNumber})
+  const ProfileScreen(
+      {Key? key,
+      required this.loggedInEmail,})
       : super(key: key);
 
   @override
@@ -26,18 +26,43 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final userRepo = Get.put(UserRepository());
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
-
-  void createUser(UserModel user) async {
-   await userRepo.createUser(user);
+  void initState() {
+    super.initState();
+    fetchUserData();
   }
 
-  @override
+  void fetchUserData() async {
+    // Get the current user
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Fetch data from Firestore
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+          .instance
+          .collection('Users')
+          .doc(user.uid)
+          .get();
+
+      if (snapshot.exists) {
+        // Extract data from the snapshot
+        Map<String, dynamic> userData = snapshot.data()!;
+        String name = userData['name'];
+        String phoneNumber = userData['number'];
+
+        // Set the fetched data in the text controllers
+        nameController.text = name;
+        phoneController.text = phoneNumber;
+      }
+    }
+  }
+
   Widget build(BuildContext context) {
-    TextEditingController nameController = TextEditingController(text : widget.name);
     TextEditingController emailController =
         TextEditingController(text: widget.loggedInEmail);
-    TextEditingController phoneController = TextEditingController(text : widget.phoneNumber);
     var size = MediaQuery.of(context).size;
     var sizeHeight = size.height;
     var sizeWidth = size.width;
@@ -92,14 +117,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ListTile(
                     leading: const Icon(Icons.person),
                     title: TextField(
+                      enabled: false,
                       cursorColor: AppConstantsColors.accentColor,
                       controller: nameController,
                       decoration: const InputDecoration(
-                        hintText: 'Enter your name',
-                        //  enabledBorder: UnderlineInputBorder(
-                        //   borderSide: BorderSide(color: AppConstantsColors.accentColor),
-                        // ),
-                        focusedBorder: UnderlineInputBorder(
+                        hintText: 'Name',
+                        enabledBorder: UnderlineInputBorder(
                           borderSide:
                               BorderSide(color: AppConstantsColors.accentColor),
                         ),
@@ -109,14 +132,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ListTile(
                     leading: const Icon(Icons.phone),
                     title: TextField(
+                      enabled: false,
                       cursorColor: AppConstantsColors.accentColor,
                       controller: phoneController,
                       decoration: const InputDecoration(
-                        hintText: 'Enter your phone number',
-                        //  enabledBorder: UnderlineInputBorder(
-                        //   borderSide: BorderSide(color: AppConstantsColors.accentColor),
-                        // ),
-                        focusedBorder: UnderlineInputBorder(
+                        hintText: 'Number',
+                        enabledBorder: UnderlineInputBorder(
                           borderSide:
                               BorderSide(color: AppConstantsColors.accentColor),
                         ),
@@ -126,21 +147,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
               SizedBox(height: sizeHeight * 0.05),
-
-              // CustomButton(
-              //   buttonColor: AppConstantsColors.accentColor,
-              //   text: 'Save',
-              //   height: sizeHeight * 0.05,
-              //   width: sizeWidth * 0.5,
-              //   onPressed: () {
-              //     final user = UserModel(
-              //       name: nameController.text.trim(),
-              //       email: emailController.text.trim(),
-              //       number: phoneController.text.trim(),
-              //     );
-              //   },
-              // )
-              // Add more details as needed
             ],
           ),
         ),

@@ -42,15 +42,13 @@ class HomePage extends StatelessWidget {
             ListTile(
               title: const Text('Profile'),
               onTap: () {
-                // Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //       builder: (context) => ProfileScreen(
-                //             loggedInEmail:
-                //                 FirebaseAuth.instance.currentUser!.email,
-                //             name : FirebaseAuth.instance.currentUser!.displayName,
-                //             phoneNumber : FirebaseAuth.instance.currentUser!.phoneNumber,
-                //           )),
-                // );
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (context) => ProfileScreen(
+                            loggedInEmail:
+                                FirebaseAuth.instance.currentUser!.email,
+                          )),
+                );
 
                 // Update the state of the app.
                 // ...

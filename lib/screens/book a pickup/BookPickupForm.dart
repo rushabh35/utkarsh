@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:utkarsh/constants/app_constants_colors.dart';
 import 'package:utkarsh/screens/book%20a%20pickup/success.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class BookPickupForm extends StatefulWidget {
   const BookPickupForm({Key? key}) : super(key: key);
@@ -19,48 +20,72 @@ class _BookPickupFormState extends State<BookPickupForm> {
   final TextEditingController _mobilenoController = TextEditingController();
   final TextEditingController _timeinputController = TextEditingController();
 
-  late String _name;
-  late String _quantity;
-  late String _location;
-  late String _number;
+  // late String _name;
+  // late String _quantity;
+  // late String _location;
+  // late String _number;
 
-  late String _date;
-  late String _time;
+  // late String _date;
+  // late String _time;
   final _formKey = GlobalKey<FormState>();
-
-  @override
   void initState() {
-    // TODO: implement initState
-    _timeinputController.text = "";
     super.initState();
-
+    _timeinputController.text = "";
+    fetchUserData();
   }
+
+  void fetchUserData() async {
+    // Get the current user
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Fetch data from Firestore
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+          .instance
+          .collection('Users')
+          .doc(user.uid)
+          .get();
+
+      if (snapshot.exists) {
+        // Extract data from the snapshot
+        Map<String, dynamic> userData = snapshot.data()!;
+        String name = userData['name'];
+        String phoneNumber = userData['number'];
+
+        // Set the fetched data in the text controllers
+        _nameController.text = name;
+        _mobilenoController.text = phoneNumber;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-            iconTheme: const IconThemeData(
-            color: Colors.grey,
-          ),
-            backgroundColor: Colors.white,
-            title: const Row(
-              children: [
-            Text('User Information',
-              style: TextStyle( 
+        iconTheme: const IconThemeData(
+          color: Colors.grey,
+        ),
+        backgroundColor: Colors.white,
+        title: const Row(
+          children: [
+            Text(
+              'User Information',
+              style: TextStyle(
                 overflow: TextOverflow.clip,
-                color : AppConstantsColors.blackColor,
-              ), 
-            ),                // const Text('Need Help?',style:TextStyle(color:Colors.black))
-              ],
-            ),
-          ),
+                color: AppConstantsColors.blackColor,
+              ),
+            ), // const Text('Need Help?',style:TextStyle(color:Colors.black))
+          ],
+        ),
+      ),
       body: Form(
-        key : _formKey,
+        key: _formKey,
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.only(top : 30.0 , left:15, right:15 , bottom: 15),
+            padding: const EdgeInsets.only(
+                top: 30.0, left: 15, right: 15, bottom: 15),
             child: Column(
               children: [
                 Container(
@@ -71,20 +96,19 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: TextFormField(
+                    enabled : false,
                     controller: _nameController,
                     cursorColor: Colors.black,
                     keyboardType: TextInputType.text,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding:
-                      EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                       hintText: "Full Name",
                       hintStyle: TextStyle(
-                        color: Colors.grey,
+                        color: Colors.black,
                         fontSize: 16,
-
                       ),
-                      
                       prefixIcon: Icon(
                         Icons.person,
                         color: Colors.grey,
@@ -96,41 +120,13 @@ class _BookPickupFormState extends State<BookPickupForm> {
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      _name = value!;
-                    },
+                    // onSaved: (value) {
+                    //   _name = value!;
+                    // },
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Container(
-                //
-                //   height: 50,
-                //   width: MediaQuery.of(context).size.width / 1.12,
-                //   decoration: BoxDecoration(
-                //     color: Colors.grey[200],
-                //     borderRadius: BorderRadius.circular(15),
-                //   ),
-                //   child: TextFormField(
-                //     cursorColor: Colors.black,
-                //
-                //     keyboardType: TextInputType.name,
-                //     decoration: const InputDecoration(
-                //       border: InputBorder.none,
-                //       contentPadding:
-                //       EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                //       hintText: 'Requirement/Food description ',
-                //       hintStyle: TextStyle(
-                //         color: Colors.grey,
-                //         fontSize: 16,
-                //       ),
-                //       prefixIcon: Icon(
-                //         Icons.food_bank,
-                //         color: Colors.grey,
-                //       ),
-                //     ),
-                //   ),
-                // ),
-                // const SizedBox(height: 20),
+
                 Container(
                   height: 50,
                   width: MediaQuery.of(context).size.width / 1.12,
@@ -139,16 +135,18 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: TextFormField(
+                    enabled : false,
+
                     controller: _mobilenoController,
                     cursorColor: Colors.black,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding:
-                      EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                       hintText: 'Contact Number',
                       hintStyle: TextStyle(
-                        color: Colors.grey,
+                        color: Colors.black,
                         fontSize: 16,
                       ),
                       prefixIcon: Icon(
@@ -162,9 +160,9 @@ class _BookPickupFormState extends State<BookPickupForm> {
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      _location = value!;
-                    },
+                    // onSaved: (value) {
+                    //   _number = value!;
+                    // },
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -182,7 +180,7 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding:
-                      EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                       hintText: 'Location',
                       hintStyle: TextStyle(
                         color: Colors.grey,
@@ -199,9 +197,9 @@ class _BookPickupFormState extends State<BookPickupForm> {
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      _location = value!;
-                    },
+                    // onSaved: (value) {
+                    //   _location = value!;
+                    // },
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -220,7 +218,7 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding:
-                      EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                       hintText: 'Pickup Date',
                       hintStyle: TextStyle(
                         color: Colors.grey,
@@ -231,14 +229,14 @@ class _BookPickupFormState extends State<BookPickupForm> {
                         color: Colors.grey,
                       ),
                     ),
-                    onTap: ()async{
-
+                    onTap: () async {
                       DateTime? pickedDate = await showDatePicker(
-                          context: context, initialDate: DateTime.now(),
-                          firstDate: DateTime.now(), //DateTime.now() - not to allow to choose before today.
-                          lastDate: DateTime(2101)
-                      );
-                      if(pickedDate != null ) {
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime
+                              .now(), //DateTime.now() - not to allow to choose before today.
+                          lastDate: DateTime(2101));
+                      if (pickedDate != null) {
                         String formattedDate = DateFormat('yyyy-MM-dd').format(
                             pickedDate); //formatted date output using intl package =>  2021-03-16
                         //you can implement different kind of Date Format here according to your requirement
@@ -249,9 +247,9 @@ class _BookPickupFormState extends State<BookPickupForm> {
                         });
                       }
                     },
-                    onSaved: (value) {
-                      _date = value! ;
-                    },
+                    // onSaved: (value) {
+                    //   _date = value! ;
+                    // },
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -269,7 +267,7 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding:
-                      EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                       hintText: 'Pickup Time',
                       hintStyle: TextStyle(
                         color: Colors.grey,
@@ -286,67 +284,11 @@ class _BookPickupFormState extends State<BookPickupForm> {
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      _time = value!;
-                    },
+                    // onSaved: (value) {
+                    //   _time = value!;
+                    // },
                   ),
                 ),
-                // Container(
-                //   height: 50,
-                //   width: MediaQuery.of(context).size.width / 1.12,
-                //   decoration: BoxDecoration(
-                //     color: Colors.grey[200],
-                //     borderRadius: BorderRadius.circular(15),
-                //   ),
-                //   child: TextFormField(
-                //     cursorColor: Colors.black,
-                //     controller: _timeinputController,
-                //     // keyboardType: TextInputType.none,
-                //     style: TextStyle(
-                //       color: Colors.black, // Set text color to black
-                //       fontSize: 16,
-                //     ),
-                //     decoration: const InputDecoration(
-                //       border: InputBorder.none,
-                //       contentPadding:
-                //       EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                //       hintText: 'Enter Pickup Time',
-                //       hintStyle: TextStyle(
-                //         color: Colors.grey,
-                //         fontSize: 16,
-                //       ),
-                //       prefixIcon: Icon(
-                //         Icons.timer,
-                //         color: Colors.grey,
-                //       ),
-                //     ),
-                //     // readOnly: true,  //set it true, so that user will not able to edit text
-                //
-                //     onTap: ()async{
-                //       TimeOfDay? pickedTime =  await showTimePicker(
-                //         initialTime: TimeOfDay.now(),
-                //         context: context,
-                //       );
-                //
-                //       if(pickedTime != null ){
-                //         print(pickedTime.format(context));   //output 10:51 PM
-                //         DateTime parsedTime = DateFormat.jm().parse(pickedTime.format(context).toString());
-                //         //output 1970-01-01 22:53:00.000
-                //         String formattedTime = DateFormat('hh:mm:ss').format(parsedTime);
-                //         //DateFormat() is from intl package, you can format the time on any pattern you need.
-                //
-                //         setState(() {
-                //           _timeinputController.text = formattedTime; //set the value of text field.
-                //         });
-                //       }else{
-                //         print("Time is not selected");
-                //       }
-                //     },
-                //     onSaved: (value) {
-                //       _time = value! ;
-                //     },
-                //   ),
-                // ),
                 const SizedBox(height: 20),
                 Container(
                   height: 50,
@@ -362,7 +304,7 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding:
-                      EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                       hintText: 'Weights in KG',
                       hintStyle: TextStyle(
                         color: Colors.grey,
@@ -379,9 +321,9 @@ class _BookPickupFormState extends State<BookPickupForm> {
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      _location = value!;
-                    },
+                    // onSaved: (value) {
+                    //   _quantity = value!;
+                    // },
                   ),
                 ),
 
@@ -392,22 +334,24 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        Map<String,dynamic> data = {
-                          "name" : _nameController.text ,
-                          "mobile" : _mobilenoController.text ,
-                          "location" : _locationController.text,
-                          "pickupDate" : _dateinputController.text,
-                          "pickupTime" : _timeinputController.text,
-                          "quantity" : _quantityController.text,
+                        Map<String, dynamic> data = {
+                          "name": _nameController.text,
+                          "mobile": _mobilenoController.text,
+                          "location": _locationController.text,
+                          "pickupDate": _dateinputController.text,
+                          "pickupTime": _timeinputController.text,
+                          "quantity": _quantityController.text,
                         };
-                        Navigator.push(context,MaterialPageRoute(
-                          builder: (context) => const SuccessPage(),
-                        ));
-                        FirebaseFirestore.instance.collection('pickupInfo').add(data);
-
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SuccessPage(),
+                            ));
+                        FirebaseFirestore.instance
+                            .collection('pickupInfo')
+                            .add(data);
                       }
                     },
-
                     child: const Text('Submit'),
                   ),
                 ),
@@ -415,7 +359,6 @@ class _BookPickupFormState extends State<BookPickupForm> {
               ],
             ),
           ),
-
         ),
       ),
     );
