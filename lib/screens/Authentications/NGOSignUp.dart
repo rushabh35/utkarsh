@@ -69,8 +69,8 @@ class _NGOSignUpState extends State<NGOSignUp> {
               textColor: AppConstantsColors.accentColor,
             ),
 
-            LoginTextFieldWidget(controller: _nameController,               hintText: 'NGO Name',
-              errorText : _isNotValid ? "Enter Name Field" : null,),
+            // LoginTextFieldWidget(controller: _nameController,               hintText: 'NGO Name',
+            //   errorText : _isNotValid ? "Enter Name Field" : null,),
 
             LoginTextFieldWidget(
               controller: _emailController,

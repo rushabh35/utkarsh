@@ -1,7 +1,11 @@
-import 'package:flutter/cupertino.dart';
+// ignore_for_file: depend_on_referenced_packages, non_constant_identifier_names
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:flutter/cupertino.dart';
+// ignore: depend_on_referenced_packages
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:utkarsh/constants/app_constants_colors.dart';
 
 import 'BookPickupForm.dart';
 
@@ -13,9 +17,9 @@ class BookPickup extends StatefulWidget {
 }
 
 class _BookPickupState extends State<BookPickup> {
-  bool _isLoading=false; //bool variable created
+  bool _isLoading = false; //bool variable created
   bool _foreigner = false;
-  String location ='Null, Press Button';
+  String location = 'Null, Press Button';
   String Address = 'Address';
   Future<Position> _getGeoLocationPosition() async {
     bool serviceEnabled;
@@ -43,14 +47,16 @@ class _BookPickupState extends State<BookPickup> {
     }
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
-    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
   }
-  Future<void> GetAddressFromLatLong(Position position)async {
-    List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
-    print(placemarks);
+
+  Future<void> GetAddressFromLatLong(Position position) async {
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
     Placemark place = placemarks[0];
-    Address = '${place.street},${place.name},${place.thoroughfare} ,${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
-    print(place.country);
+    Address =
+        '${place.street},${place.name},${place.thoroughfare} ,${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
     // if({place.country}!="India"){
     //   _foreigner = true;
     // }else{
@@ -59,20 +65,23 @@ class _BookPickupState extends State<BookPickup> {
     // if(placemarks[2]!="IN"){
     //   _foreigner = true;
     // }
-    setState(()  {
-    });
+    setState(() {});
   }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home:Scaffold(
+     var size = MediaQuery.of(context).size;
+    var sizeHeight = size.height;
+    var sizeWidth = size.width;
+    return Scaffold(
           appBar: AppBar(
+            iconTheme: const IconThemeData(
+            color: Colors.grey,
+          ),
             backgroundColor: Colors.white,
             title: const Row(
               children: [
-                Text('Utkarsh',style:TextStyle(color:Colors.black)),
-                SizedBox(width:175),
+                Text('Utkarsh', style: TextStyle(color: Colors.black)),
                 // const Text('Need Help?',style:TextStyle(color:Colors.black))
               ],
             ),
@@ -86,142 +95,147 @@ class _BookPickupState extends State<BookPickup> {
                     children: [
                       const Text(
                         "HELP US WITH YOUR EXACT \n"
-                            "LOCATION",
+                        "LOCATION",
                         maxLines: 3,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 25,
-                          color:Color.fromRGBO(241, 85, 34,1),
+                          color: AppConstantsColors.blackColor,
                           // fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height:40),
+                      const SizedBox(height: 40),
                       const Text(
                         "This allows us to check if your area is \n"
-                            "within our coverage",
+                        "within our coverage",
                         maxLines: 3,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 20,
-                          color:Colors.black,
+                          color: Colors.black,
                           // fontWeight: FontWeight.bold,
                           // fontFamily:
                         ),
                       ),
-                      const SizedBox(height:30),
-
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.black, width: 2.0),
-                            ),
-                            hintText: 'Building , Block , Area',
-                            prefixIcon: Icon(Icons.location_on,color: Colors.black),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height:15),
+                      const SizedBox(height: 30),
+                      // const Padding(
+                      //   padding:
+                      //       EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                      //   child: TextField(
+                      //     decoration: InputDecoration(
+                      //       enabledBorder: OutlineInputBorder(
+                      //         borderSide:
+                      //             BorderSide(color: Colors.black, width: 2.0),
+                      //       ),
+                      //       hintText: 'Building , Block , Area',
+                      //       prefixIcon:
+                      //           Icon(Icons.location_on, color: Colors.black),
+                      //     ),
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 15),
                       const Text(
                         "----- OR -----",
                         maxLines: 3,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 17,
-                          color:Colors.black,
+                          color: Colors.black,
                           // fontWeight: FontWeight.bold,
                           // fontFamily:
                         ),
                       ),
-                      const SizedBox(height:15),
-
+                      const SizedBox(height: 15),
                       ElevatedButton(
-                        child: const Text('Auto Detect Location📍',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color:Colors.white,
-                          ),),
                         style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(const Color.fromRGBO(
-                                78, 139, 218, 1.0)),
-                            foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                            padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(15)),
-
-                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                )
-                            )
-                        ),
-                        onPressed: () async{
+                            backgroundColor: MaterialStateProperty.all(
+                                 AppConstantsColors.accentColor),
+                                
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.white),
+                            padding: MaterialStateProperty.all<EdgeInsets>(
+                                const EdgeInsets.all(15)),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18.0),
+                            ))),
+                        onPressed: () async {
                           Position position = await _getGeoLocationPosition();
-                          location ='Lat: ${position.latitude} , Long: ${position.longitude}';
+                          location =
+                              'Lat: ${position.latitude} , Long: ${position.longitude}';
                           GetAddressFromLatLong(position);
                         },
+                        child: const Text(
+                          'Auto Detect Location📍',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 20,),
+                      const SizedBox(
+                        height: 20,
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Container(
-                          decoration:BoxDecoration(
+                          decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5),
                             color: Colors.grey[300],
                           ),
-                          child:  Container(
-                            child : Padding(
+                          child: Container(
+                            child: Padding(
                               padding: const EdgeInsets.all(12.0),
-                              child: Text(
-                                  Address,
+                              child: Text(Address,
                                   style: const TextStyle(
-                                      color: Colors.black,fontSize: 20
-                                  )
-                              ),
+                                      color: Colors.black, fontSize: 20)),
                             ),
                           ),
                         ),
-
                       ),
-                      const SizedBox(height: 20,),
-                      if(Address != 'Address')...[
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      if (Address != 'Address') ...[
                         ElevatedButton(
-                            child: const Text('Proceed',
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.black),
+                                foregroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.white),
+                                padding: MaterialStateProperty.all<EdgeInsets>(
+                                    const EdgeInsets.all(10)),
+                                shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18.0),
+                                ))),    
+                            onPressed: () {
+                              if (_foreigner == true) {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const BookPickupForm(),
+                                ));
+                              } else {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const BookPickupForm(),
+                                ));
+                              }
+                            },
+                            child: const Text(
+                              'Proceed',
                               style: TextStyle(
                                 fontSize: 18,
-                                color:Colors.white,
-                              ),),
-                            style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all( Colors.black),
-                                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                                padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(10)),
-
-                                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(18.0),
-                                    )
-                                )
-                            ),
-
-                            onPressed: ()  {
-                              if(_foreigner==true) {
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  const BookPickupForm(),));
-                              }
-                              else{
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context) =>  const BookPickupForm(),));
-
-                              }
-                            }
-                        ),
-
+                                color: Colors.white,
+                              ),
+                            )),
                       ]
                     ],
                   ),
                 ),
               ),
-
             ),
           ),
-        )
-    );
+        );
   }
 }

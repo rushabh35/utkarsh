@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:utkarsh/services/auth.dart';
 import 'screens/LandingScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MyApp());
+  runApp(MultiProvider(providers: [
+    Provider<AuthenticationServices>(
+      create: (context) => AuthenticationServices(FirebaseAuth.instance),
+    ),
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -15,7 +22,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-         debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner: false,
         // theme: ThemeData(
         //   primarySwatch: Colors.blue,
         //   textSelectionTheme: const TextSelectionThemeData(cursorColor: Colors.black),
@@ -32,7 +39,6 @@ class MyApp extends StatelessWidget {
         // // const LoginScreen()
         //   LoginScreen()
 
-    );
+        );
   }
 }
-

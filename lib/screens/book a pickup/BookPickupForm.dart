@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:utkarsh/constants/app_constants_colors.dart';
 import 'package:utkarsh/screens/book%20a%20pickup/success.dart';
 
 class BookPickupForm extends StatefulWidget {
@@ -40,9 +41,21 @@ class _BookPickupFormState extends State<BookPickupForm> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(241, 86, 34,1),
-        title : const Text('User Information',style: TextStyle( overflow: TextOverflow.clip),),
-      ),
+            iconTheme: const IconThemeData(
+            color: Colors.grey,
+          ),
+            backgroundColor: Colors.white,
+            title: const Row(
+              children: [
+            Text('User Information',
+              style: TextStyle( 
+                overflow: TextOverflow.clip,
+                color : AppConstantsColors.blackColor,
+              ), 
+            ),                // const Text('Need Help?',style:TextStyle(color:Colors.black))
+              ],
+            ),
+          ),
       body: Form(
         key : _formKey,
         child: SingleChildScrollView(
@@ -71,6 +84,7 @@ class _BookPickupFormState extends State<BookPickupForm> {
                         fontSize: 16,
 
                       ),
+                      
                       prefixIcon: Icon(
                         Icons.person,
                         color: Colors.grey,

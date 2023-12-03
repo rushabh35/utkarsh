@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../constants/app_constants_colors.dart';
 
-class LoginTextFieldWidget extends StatelessWidget {
+class TextFieldWidget extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final String? errorText;
@@ -10,7 +10,7 @@ class LoginTextFieldWidget extends StatelessWidget {
   final InputDecoration decoration;
   final TextInputType keyboardType;
 
-  LoginTextFieldWidget({
+  TextFieldWidget({
     required this.controller,
     required this.hintText,
      this.errorText = "",
@@ -23,18 +23,7 @@ class LoginTextFieldWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppConstantsColors.transparent,
-      child: TextFormField(
-        validator: (value)
-                          {
-                            if(value!.isEmpty)
-                            {
-                              return("Please Enter Your Email");
-                            }
-                            if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
-                                .hasMatch(value)) {
-                              return ("Please Enter a valid email");
-                            }
-                          },
+      child: TextField(
         cursorColor: Colors.green,
         keyboardType: keyboardType,
         controller: controller,

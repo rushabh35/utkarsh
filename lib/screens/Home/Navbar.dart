@@ -1,13 +1,16 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 // import 'package:her2/pages/ui/HomePage.dart';
 // import 'package:her2/pages/blogs.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:utkarsh/constants/app_constants_colors.dart';
 import 'package:utkarsh/screens/Authentications/NGOSignUp.dart';
 import 'package:utkarsh/screens/Home/Home.dart';
 
 class BottomNavBar extends StatefulWidget {
+  const BottomNavBar({super.key});
+
 
 
   @override
@@ -142,7 +145,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
               //     _selectedIndex = index;
               //   });
               // },
-              onTabChange: (index) => setState(() => this._selectedIndex = index),
+              onTabChange: (index) => setState(() => _selectedIndex = index),
             ),
           ),
         ),

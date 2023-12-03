@@ -46,6 +46,7 @@ class _UserSignInState extends State<UserSignIn> {
               controller: _emailController,
               hintText: 'Email',
               errorText: _isNotValid ? "Enter Email Field" : null,
+              
             ),
 
             PasswordTextField(
@@ -57,28 +58,61 @@ class _UserSignInState extends State<UserSignIn> {
             CustomButton(
               buttonColor: AppConstantsColors.accentColor,
               text: 'SIGN IN',
-              onPressed: () {
+              onPressed: () => {
                 // loginUser();
-                FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                        email: _emailController.text,
-                        password: _passWordController.text
-                        )
-                    .then((value) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => BottomNavBar()),
-                  );
-                }).onError((error, stackTrace) {
-                  print("Error ${error.toString()})");
-                });
-
-                try {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => BottomNavBar()));
-                } catch (e) {
-                  print("Navigation error: $e");
-                }
+                if (_emailController.text.isEmpty ||
+                    _passWordController.text.isEmpty)
+                  {
+                    setState(() {
+                      _isNotValid = true;
+                    })
+                  }
+                else
+                  {
+                    setState(() {
+                      _isNotValid = false;
+                    }),
+                      FirebaseAuth.instance
+                          .signInWithEmailAndPassword(
+                              email: _emailController.text,
+                              password: _passWordController.text)
+                          .then((value) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const BottomNavBar()),
+                        );
+                      }).catchError((error) {
+                        String errorMessage =
+                            "An error occurred wrong email or incorrect password";
+                        if (error.code == 'user-not-found') {
+                          errorMessage = 'No user found for that email.';
+                        } else if (error.code == 'wrong-password') {
+                          errorMessage = 'Wrong password provided.';
+                        }
+                        // Display error message in the UI
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Login Error'),
+                              content: Text(errorMessage),
+                              actions: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppConstantsColors.accentColor,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }),
+                  },
               },
               width: sizeWidth * 0.92,
               height: sizeHeight * 0.06,
