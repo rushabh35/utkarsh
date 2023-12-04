@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:utkarsh/screens/Home/Home.dart';
+import 'package:utkarsh/screens/Home/Navbar.dart';
 
 
 
@@ -38,7 +39,7 @@ class _SuccessPageState extends State<SuccessPage> {
                 shape: BoxShape.circle,
               ),
               child: Image.asset(
-                "assets/card.png",
+                'assets/card.png',
                 fit: BoxFit.contain,
               ),
             ),
@@ -84,7 +85,7 @@ class _SuccessPageState extends State<SuccessPage> {
                       )
                   ),
                    onPressed: () {  Navigator.push(context,MaterialPageRoute(
-                       builder: (context) =>  HomePage() )); },
+                       builder: (context) =>  BottomNavBar() )); },
                   child: const Text('Home',style: TextStyle(fontSize: 18)),
               ),
 

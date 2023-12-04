@@ -15,10 +15,10 @@ import 'package:get/get.dart';
 class ProfileScreen extends StatefulWidget {
   final String? loggedInEmail;
 
-  const ProfileScreen(
-      {Key? key,
-      required this.loggedInEmail,})
-      : super(key: key);
+  const ProfileScreen({
+    Key? key,
+    required this.loggedInEmail,
+  }) : super(key: key);
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -56,6 +56,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // Set the fetched data in the text controllers
         nameController.text = name;
         phoneController.text = phoneNumber;
+
+        List pickupInfo = userData['pickupInfo'];
       }
     }
   }

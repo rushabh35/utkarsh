@@ -331,28 +331,144 @@ class _BookPickupFormState extends State<BookPickupForm> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState!.save();
-                        Map<String, dynamic> data = {
-                          "name": _nameController.text,
-                          "mobile": _mobilenoController.text,
-                          "location": _locationController.text,
-                          "pickupDate": _dateinputController.text,
-                          "pickupTime": _timeinputController.text,
-                          "quantity": _quantityController.text,
-                        };
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SuccessPage(),
-                            ));
-                        FirebaseFirestore.instance
-                            .collection('pickupInfo')
-                            .add(data);
-                      }
-                    },
-                    child: const Text('Submit'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppConstantsColors.accentColor,
+                    ),
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+
+                          _formKey.currentState!.save();
+
+                          // Create data for pickupInfo
+                          Map<String, dynamic> pickupData = {
+                            // "name": _nameController.text,
+                            // "mobile": _mobilenoController.text,
+                            "location": _locationController.text,
+                            "pickupDate": _dateinputController.text,
+                            "pickupTime": _timeinputController.text,
+                            "quantity": _quantityController.text,
+                          };
+                          Map<String, dynamic> data = {
+                                                "name": _nameController.text,
+                                                "mobile": _mobilenoController.text,
+                                                "location": _locationController.text,
+                                                "pickupDate": _dateinputController.text,
+                                                "pickupTime": _timeinputController.text,
+                                                "quantity": _quantityController.text,
+                                                "userId" : FirebaseAuth.instance.currentUser!.uid,
+                          };
+                          // Get the current user's UID
+                          String currentUserUID = FirebaseAuth.instance.currentUser!.uid;
+
+                          try {
+                            // Fetch the user document ID from Users collection
+                            FirebaseFirestore.instance
+                                                  .collection('pickupInfo')
+                                                  .add(data);
+                            QuerySnapshot<Map<String, dynamic>> userQuery = await FirebaseFirestore.instance
+                                .collection('Users')
+                                .where('id', isEqualTo: currentUserUID)
+                                .get();
+
+                            if (userQuery.docs.isNotEmpty) {
+                              // If user document found, get the document ID
+                              String userDocumentID = userQuery.docs.first.id;
+
+                              // Update the Users collection with the pickupInfo data
+                              await FirebaseFirestore.instance
+                                  .collection('Users')
+                                  .doc(userDocumentID)
+                                  .update({"pickupInfo": FieldValue.arrayUnion([pickupData])});
+
+                              // Navigate to the SuccessPage
+                              // ignore: use_build_context_synchronously
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SuccessPage(),
+                                ),
+                              );
+                              // ignore: use_build_context_synchronously
+                              showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Success'),
+                              content: Text("Successfully saved data"),
+                              actions: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppConstantsColors.accentColor,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+ 
+                            } else {
+                              // Handle the case when the user document is not found
+                              print("");
+                               String errorMessage =
+                            "User document not found";
+                              // ignore: use_build_context_synchronously
+                              showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Error'),
+                              content: Text(errorMessage),
+                              actions: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppConstantsColors.accentColor,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+ 
+                            }
+                          } catch (error) {
+                            // Handle errors, if any
+                            String errorMessage =
+                            "Error updating Users collection: $error";
+                            // ignore: use_build_context_synchronously
+                            showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Error'),
+                              content: Text(errorMessage),
+                              actions: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppConstantsColors.accentColor,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+ 
+                          }
+                          // ignore: use_build_context_synchronously
+                                                 }
+                      },
+                    child:  Text('Submit',),
                   ),
                 ),
                 //Row

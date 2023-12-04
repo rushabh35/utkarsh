@@ -10,15 +10,14 @@ class UserModel {
     required this.name,
     required this.email,
     required this.number,
-    
-    // this.bookAPickup = const []
+    this.pickupInfo = const []
   });
 
   String? id;
   String name;
   String email;
   String number;
-  // List bookAPickup;
+  List pickupInfo;
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     // print("in user factory");
@@ -33,7 +32,7 @@ class UserModel {
         // autoLength: map['autoLength'] ?? true,
         // cycleLength: int.parse(map['cycleLength'].toString()),
         // periodLength: int.parse(map['periodLength'].toString()),
-        // periodList: map['periodList'] ?? []
+        pickupInfo: map['pickupInfo'] ?? []
       );}
 
   Map<String, dynamic> toJson() =>
@@ -42,6 +41,7 @@ class UserModel {
         'name': name,
         'email': email,
         'number': number,
+        'pickupInfo': pickupInfo,
 
       };
 }
