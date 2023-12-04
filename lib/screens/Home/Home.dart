@@ -9,7 +9,6 @@ import 'package:utkarsh/screens/book%20a%20pickup/BookPickup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../widgets/HomeTileWidgets.dart';
 import '../../widgets/Menubar/MenuBar.dart';
-
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -35,6 +34,15 @@ class HomePage extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const BookPickup()));
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            ListTile(
+              title: const Text('Event Calendar'),
+              onTap: () {
+                // Navigator.of(context).push(MaterialPageRoute(
+                //     builder: (context) =>  CalendarScreen()));
                 // Update the state of the app.
                 // ...
               },

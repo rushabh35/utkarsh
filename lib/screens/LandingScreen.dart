@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:utkarsh/constants/app_constants_colors.dart';
+import 'package:utkarsh/screens/Authentications/AdminLogin.dart';
 import 'package:utkarsh/screens/Authentications/NGOSignIn.dart';
 import 'package:utkarsh/screens/Authentications/NGOSignUp.dart';
 import '../../../../../utils/ui/CustomButton.dart';
@@ -62,7 +63,22 @@ class _LandingPageState extends State<LandingPage> {
                   }
                 },
               ),
-
+              SizedBox(
+                height: sizeHeight * 0.05,
+              ),
+              CustomButton(
+                buttonColor: AppConstantsColors.accentColor,
+                width: sizeWidth * 0.7,
+                height: sizeHeight * 0.06,
+                text: 'Admin Login',
+                onPressed: () {
+                  try {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AdminLogin()));
+                  } catch (e) {
+                    print("Navigation error: $e");
+                  }
+                },
+              ),
             ],
           ),
 
