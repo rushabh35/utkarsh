@@ -14,3 +14,9 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
+Flutter 3.13.0 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision efbf63d9c6 (4 months ago) • 2023-08-15 21:05:06 -0500
+Engine • revision 1ac611c64e
+Tools • Dart 3.1.0 • DevTools 2.25.0

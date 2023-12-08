@@ -23,6 +23,7 @@ class _BookPickupState extends State<BookPickup> {
   String Address = 'Address';
   Future<Position> _getGeoLocationPosition() async {
     bool serviceEnabled;
+    
     LocationPermission permission;
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
