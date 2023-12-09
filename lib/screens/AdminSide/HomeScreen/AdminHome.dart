@@ -1,5 +1,6 @@
 import 'dart:io';
-
+import 'dart:typed_data';
+import 'package:multi_image_picker_view/multi_image_picker_view.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -15,36 +16,55 @@ class AdminHome extends StatefulWidget {
 }
 
 class _AdminHomeState extends State<AdminHome> {
-  final ImagePicker _picker = ImagePicker();
+  List<File> selectedImages = [];
+  final picker = ImagePicker();
+Future getImages() async {
+     List<XFile>? pickedFiles = await picker.pickMultiImage(
+      imageQuality: 100,
+      maxHeight: 1000,
+      maxWidth: 1000,
+    );
+
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      setState(() {
+        selectedImages = pickedFiles.map((file) => File(file.path)).toList();
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nothing is selected')),
+      );
+    }
+  }
 
   Future<void> _uploadImages(String documentId) async {
-    try{
-      final List<XFile>? images = await _picker.pickMultiImage();
-          
-      if (images != null) {
-        for (var image in images) {
-          Reference storageReference = FirebaseStorage.instance.ref().child("pickupInfoImages").child("$documentId/${DateTime.now().millisecondsSinceEpoch}");
+     try {
+      for (File imageFile in selectedImages) {
+        String uniqueFileName =
+            DateTime.now().millisecondsSinceEpoch.toString();
+        Reference storageReference = FirebaseStorage.instance
+            .ref()
+            .child("pickupInfoImages")
+            .child("$documentId/$uniqueFileName.jpg");
 
-          UploadTask uploadTask = storageReference.putFile(File(image.path));
+        UploadTask uploadTask = storageReference.putFile(imageFile);
 
-          await uploadTask.whenComplete(() async {
-            String imageUrl = await storageReference.getDownloadURL();
+        await uploadTask.whenComplete(() async {
+          String imageUrl = await storageReference.getDownloadURL();
 
-            // Update Firestore document with the image URL
-            await FirebaseFirestore.instance
-                .collection('pickupInfo')
-                .doc(documentId)
-                .update({
-              'images': FieldValue.arrayUnion([imageUrl]),
-            });
+          // Update Firestore document with the image URL
+          await FirebaseFirestore.instance
+              .collection('pickupInfo')
+              .doc(documentId)
+              .update({
+            'images': FieldValue.arrayUnion([imageUrl]),
           });
-        }
+        });
       }
-    } catch(error){
+    } catch (error) {
       print("Error uploading image: $error");
     }
-    
   }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -147,11 +167,20 @@ class _AdminHomeState extends State<AdminHome> {
                               if(snapshot.data!.docs[i]['order_open'] == false )
                                 CustomButton(
                                   buttonColor: AppConstantsColors.accentColor,
-                                  width: sizeWidth * 0.5,
+                                  width: sizeWidth * 0.4,
                                   height: 30,
                                   text: "Upload Images of Pickup",
-                                  onPressed: () {
-                                    _uploadImages(snapshot.data!.docs[i].id);
+                                  onPressed: () async {
+                                    await getImages();
+                                    _uploadImages(  snapshot.data!.docs[i].id);
+                                    // await getImages();
+                                    // await _uploadImages(snapshot.data!.docs[i].id);
+                                    // FirebaseFirestore.instance
+                                    //     .collection('pickupInfo')
+                                    //     .doc(snapshot.data!.docs[i].id)
+                                    //     .update({
+                                    // 'images': FieldValue.arrayUnion(selectedImages),
+                                    // });
                                   },
                                 ),
                             ],

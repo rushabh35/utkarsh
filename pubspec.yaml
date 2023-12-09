@@ -51,8 +51,8 @@ dev_dependencies:
   image_picker: ^0.8.4
   google_nav_bar: ^5.0.6
   line_icons: ^2.0.1
-  cloud_firestore: ^4.12.2
-  firebase_storage: ^11.4.1
+  cloud_firestore: ^4.13.5
+  firebase_storage: ^11.5.5
   firebase_core: ^2.21.0
   firebase_auth: ^4.12.1
   sidebar_bigeagle: ^0.2.2+1
@@ -68,6 +68,7 @@ dev_dependencies:
   provider: ^6.0.2
   table_calendar: ^3.0.0
   intl: ^0.17.0
+  multi_image_picker_view: ^0.0.17
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
