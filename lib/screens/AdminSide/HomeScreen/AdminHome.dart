@@ -6,7 +6,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:utkarsh/constants/app_constants_colors.dart';
+import 'package:utkarsh/screens/LandingScreen.dart';
 import 'package:utkarsh/utils/ui/CustomButton.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AdminHome extends StatefulWidget {
   const AdminHome({Key? key}) : super(key: key);
@@ -18,8 +20,8 @@ class AdminHome extends StatefulWidget {
 class _AdminHomeState extends State<AdminHome> {
   List<File> selectedImages = [];
   final picker = ImagePicker();
-Future getImages() async {
-     List<XFile>? pickedFiles = await picker.pickMultiImage(
+  Future getImages() async {
+    List<XFile>? pickedFiles = await picker.pickMultiImage(
       imageQuality: 100,
       maxHeight: 1000,
       maxWidth: 1000,
@@ -37,7 +39,7 @@ Future getImages() async {
   }
 
   Future<void> _uploadImages(String documentId) async {
-     try {
+    try {
       for (File imageFile in selectedImages) {
         String uniqueFileName =
             DateTime.now().millisecondsSinceEpoch.toString();
@@ -71,6 +73,30 @@ Future getImages() async {
     var sizeHeight = size.height;
     var sizeWidth = size.width;
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: AppConstantsColors.accentColor,
+              ),
+              child: Text('Admin Side Drawer'),
+            ),
+            const Divider(),
+            ListTile(
+              title: const Text('Log Out'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.of(context).pop();
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const LandingPage()));
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         iconTheme: const IconThemeData(
           color: Colors.black,
@@ -98,10 +124,7 @@ Future getImages() async {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-       
-       
-       
-               children: [
+                      children: [
                         Text(
                           "Name: ${snapshot.data!.docs[i]['name']}",
                           style: const TextStyle(
@@ -145,14 +168,14 @@ Future getImages() async {
                             color: Colors.white,
                           ),
                         ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              CustomButton(
-                                buttonColor: AppConstantsColors.accentColor,
-                                width: sizeWidth * 0.3,
-                                height: 30,
-                                text: snapshot.data!.docs[i]['order_open'] == true
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            CustomButton(
+                              buttonColor: AppConstantsColors.accentColor,
+                              width: sizeWidth * 0.3,
+                              height: 30,
+                              text: snapshot.data!.docs[i]['order_open'] == true
                                   ? "Pickup Open"
                                   : "Pickup Done",
                               onPressed: () {
@@ -162,31 +185,29 @@ Future getImages() async {
                                     .update({
                                   'order_open': false,
                                 });
+                              },
+                            ),
+                            if (snapshot.data!.docs[i]['order_open'] == false)
+                              CustomButton(
+                                buttonColor: AppConstantsColors.accentColor,
+                                width: sizeWidth * 0.4,
+                                height: 30,
+                                text: "Upload Images of Pickup",
+                                onPressed: () async {
+                                  await getImages();
+                                  _uploadImages(snapshot.data!.docs[i].id);
+                                  // await getImages();
+                                  // await _uploadImages(snapshot.data!.docs[i].id);
+                                  // FirebaseFirestore.instance
+                                  //     .collection('pickupInfo')
+                                  //     .doc(snapshot.data!.docs[i].id)
+                                  //     .update({
+                                  // 'images': FieldValue.arrayUnion(selectedImages),
+                                  // });
                                 },
                               ),
-                              if(snapshot.data!.docs[i]['order_open'] == false )
-                                CustomButton(
-                                  buttonColor: AppConstantsColors.accentColor,
-                                  width: sizeWidth * 0.4,
-                                  height: 30,
-                                  text: "Upload Images of Pickup",
-                                  onPressed: () async {
-                                    await getImages();
-                                    _uploadImages(  snapshot.data!.docs[i].id);
-                                    // await getImages();
-                                    // await _uploadImages(snapshot.data!.docs[i].id);
-                                    // FirebaseFirestore.instance
-                                    //     .collection('pickupInfo')
-                                    //     .doc(snapshot.data!.docs[i].id)
-                                    //     .update({
-                                    // 'images': FieldValue.arrayUnion(selectedImages),
-                                    // });
-                                  },
-                                ),
-                            ],
-                          ),
-                          
-
+                          ],
+                        ),
                       ],
                     ),
                   ),

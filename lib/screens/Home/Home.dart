@@ -18,63 +18,64 @@ class HomePage extends StatelessWidget {
     var sizeHeight = size.height;
     var sizeWidth = size.width;
     return Scaffold(
-      drawer: Drawer(
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: AppConstantsColors.accentColor,
+        drawer: Drawer(
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
+            children: [
+              const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: AppConstantsColors.accentColor,
+                ),
+                child: Text('Drawer Header'),
               ),
-              child: Text('Drawer Header'),
-            ),
-            ListTile(
-              title: const Text('Book A Pickup'),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const BookPickup()));
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              title: const Text('Event Calendar'),
-              onTap: () {
-                // Navigator.of(context).push(MaterialPageRoute(
-                //     builder: (context) =>  CalendarScreen()));
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              title: const Text('Profile'),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (context) => ProfileScreen(
-                            loggedInEmail:
-                                FirebaseAuth.instance.currentUser!.email,
-                          )),
-                );
+              ListTile(
+                title: const Text('Book A Pickup'),
+                onTap: () {
+           
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const BookPickup()));
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+              ListTile(
+                title: const Text('Event Calendar'),
+                onTap: () {
+                  // Navigator.of(context).push(MaterialPageRoute(
+                  //     builder: (context) =>  CalendarScreen()));
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+              ListTile(
+                title: const Text('Profile'),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) => ProfileScreen(
+                              loggedInEmail:
+                                  FirebaseAuth.instance.currentUser!.email,
+                            )),
+                  );
 
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            const Divider(),
-            ListTile(
-              title: const Text('Log Out'),
-              onTap: () async {
-                await FirebaseAuth.instance.signOut();
-                Navigator.of(context).pop();
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const LandingPage()));
-              },
-            ),
-          ],
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+              const Divider(),
+              ListTile(
+                title: const Text('Log Out'),
+                onTap: () async {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const LandingPage()));
+                },
+              ),
+            ],
+          ),
         ),
-      ),
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.black),
 

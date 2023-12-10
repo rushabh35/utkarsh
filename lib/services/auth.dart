@@ -43,33 +43,35 @@ class AuthenticationServices {
   // }
 
   //sign out
-  Future<String?> signUp({
-     String? name,
-    required String email,
-     String? number,
-    required String password,
-  }) async {
-    try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+  Future<String> signUp({
+  required String name,
+  required String email,
+  required String number,
+  required String password,
+}) async {
+  try {
+    await _firebaseAuth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
 
-      User? user = _firebaseAuth.currentUser;
-      String? uid = user?.uid;
+    User? user = _firebaseAuth.currentUser;
+    String? uid = user?.uid;
 
-      await _collectionReference.doc(uid).set({
-        'id': uid,
-        'name': name,
-        'email': email,
-        'number': number,
-      });
-            return "Signed up";
+    await _collectionReference.doc(uid).set({
+      'id': uid,
+      'name': name,
+      'email': email,
+      'number': number,
+    });
 
-            
-    } on FirebaseAuthException catch (e) {
-      return e.message;
-    }
+    return "Signed up";
+  } on FirebaseAuthException catch (e) {
+    // Log or handle the error as needed
+    print("Error during sign up: ${e.message}");
+    return e.message ?? "An error occurred during sign up";
   }
+}
+
 
 }

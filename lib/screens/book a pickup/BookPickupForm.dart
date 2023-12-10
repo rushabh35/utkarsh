@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -338,16 +340,6 @@ class _BookPickupFormState extends State<BookPickupForm> {
                         if (_formKey.currentState!.validate()) {
 
                           _formKey.currentState!.save();
-
-                          // Create data for pickupInfo
-                          Map<String, dynamic> pickupData = {
-                            // "name": _nameController.text,
-                            // "mobile": _mobilenoController.text,
-                            "location": _locationController.text,
-                            "pickupDate": _dateinputController.text,
-                            "pickupTime": _timeinputController.text,
-                            "quantity": _quantityController.text,
-                          };
                           Map<String, dynamic> data = {
                                                 "name": _nameController.text,
                                                 "mobile": _mobilenoController.text,
@@ -355,89 +347,55 @@ class _BookPickupFormState extends State<BookPickupForm> {
                                                 "pickupDate": _dateinputController.text,
                                                 "pickupTime": _timeinputController.text,
                                                 "quantity": _quantityController.text,
+                                                "order_open" : true,
                                                 "userId" : FirebaseAuth.instance.currentUser!.uid,
                           };
-                          // Get the current user's UID
                           String currentUserUID = FirebaseAuth.instance.currentUser!.uid;
-
                           try {
-                            // Fetch the user document ID from Users collection
-                            FirebaseFirestore.instance
-                                                  .collection('pickupInfo')
-                                                  .add(data);
-                            QuerySnapshot<Map<String, dynamic>> userQuery = await FirebaseFirestore.instance
-                                .collection('Users')
-                                .where('id', isEqualTo: currentUserUID)
-                                .get();
+                                FirebaseFirestore.instance
+                                .collection('pickupInfo')
+                                .add(data)
+                                .then((DocumentReference<Map<String, dynamic>> docRef) async {
+                              String pickupInfoID = docRef.id;
 
-                            if (userQuery.docs.isNotEmpty) {
-                              // If user document found, get the document ID
-                              String userDocumentID = userQuery.docs.first.id;
-
-                              // Update the Users collection with the pickupInfo data
+                              // Update the Users collection with the pickupInfo data and ID
                               await FirebaseFirestore.instance
                                   .collection('Users')
-                                  .doc(userDocumentID)
-                                  .update({"pickupInfo": FieldValue.arrayUnion([pickupData])});
+                                  .doc(currentUserUID)
+                                  .update({
+                                "pickupInfo": FieldValue.arrayUnion([pickupInfoID]),
+                              });
 
                               // Navigate to the SuccessPage
-                              // ignore: use_build_context_synchronously
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const SuccessPage(),
                                 ),
                               );
-                              // ignore: use_build_context_synchronously
+
                               showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Success'),
-                              content: Text("Successfully saved data"),
-                              actions: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppConstantsColors.accentColor,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
- 
-                            } else {
-                              // Handle the case when the user document is not found
-                              print("");
-                               String errorMessage =
-                            "User document not found";
-                              // ignore: use_build_context_synchronously
-                              showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Error'),
-                              content: Text(errorMessage),
-                              actions: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppConstantsColors.accentColor,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
- 
-                            }
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Success'),
+                                    content: const Text("Successfully saved data"),
+                                    actions: [
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppConstantsColors.accentColor,
+                                        ),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            });
+
                           } catch (error) {
                             // Handle errors, if any
                             String errorMessage =
@@ -468,7 +426,7 @@ class _BookPickupFormState extends State<BookPickupForm> {
                           // ignore: use_build_context_synchronously
                                                  }
                       },
-                    child:  Text('Submit',),
+                    child:  const Text('Submit',),
                   ),
                 ),
                 //Row
