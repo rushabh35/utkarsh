@@ -1,26 +1,33 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:utkarsh/constants/app_constants_colors.dart';
 import 'package:utkarsh/screens/book%20a%20pickup/success.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:utkarsh/utils/ui/CustomButton.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 
-class BookPickupForm extends StatefulWidget {
-  const BookPickupForm({Key? key}) : super(key: key);
+class EventAdd extends StatefulWidget {
+  const EventAdd({Key? key}) : super(key: key);
 
   @override
-  State<BookPickupForm> createState() => _BookPickupFormState();
+  State<EventAdd> createState() => _EventAddState();
 }
 
-class _BookPickupFormState extends State<BookPickupForm> {
+class _EventAddState extends State<EventAdd> {
   final TextEditingController _dateinputController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _mobilenoController = TextEditingController();
   final TextEditingController _timeinputController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _skillsController = TextEditingController();
+  final FocusNode _descriptionFocus = FocusNode();
 
   // late String _name;
   // late String _quantity;
@@ -33,36 +40,62 @@ class _BookPickupFormState extends State<BookPickupForm> {
   void initState() {
     super.initState();
     _timeinputController.text = "";
-    fetchUserData();
   }
 
-  void fetchUserData() async {
-    // Get the current user
-    User? user = FirebaseAuth.instance.currentUser;
+  List<File> selectedImages = [];
+  final picker = ImagePicker();
+  Future getImages() async {
+    List<XFile>? pickedFiles = await picker.pickMultiImage(
+      imageQuality: 100,
+      maxHeight: 1000,
+      maxWidth: 1000,
+    );
 
-    if (user != null) {
-      // Fetch data from Firestore
-      DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
-          .instance
-          .collection('Users')
-          .doc(user.uid)
-          .get();
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      setState(() {
+        selectedImages = pickedFiles.map((file) => File(file.path)).toList();
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nothing is selected')),
+      );
+    }
+  }
 
-      if (snapshot.exists) {
-        // Extract data from the snapshot
-        Map<String, dynamic> userData = snapshot.data()!;
-        String name = userData['name'];
-        String phoneNumber = userData['number'];
+  Future<void> _uploadImages(String documentId) async {
+    try {
+      for (File imageFile in selectedImages) {
+        String uniqueFileName =
+            DateTime.now().millisecondsSinceEpoch.toString();
+        Reference storageReference = FirebaseStorage.instance
+            .ref()
+            .child("pickupInfoImages")
+            .child("$documentId/$uniqueFileName.jpg");
 
-        // Set the fetched data in the text controllers
-        _nameController.text = name;
-        _mobilenoController.text = phoneNumber;
+        UploadTask uploadTask = storageReference.putFile(imageFile);
+
+        await uploadTask.whenComplete(() async {
+          String imageUrl = await storageReference.getDownloadURL();
+
+          // Update Firestore document with the image URL
+          await FirebaseFirestore.instance
+              .collection('pickupInfo')
+              .doc(documentId)
+              .update({
+            'images': FieldValue.arrayUnion([imageUrl]),
+          });
+        });
       }
+    } catch (error) {
+      print("Error uploading image: $error");
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    var sizeHeight = size.height;
+    var sizeWidth = size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -73,7 +106,7 @@ class _BookPickupFormState extends State<BookPickupForm> {
         title: const Row(
           children: [
             Text(
-              'User Information',
+              'Event Registration',
               style: TextStyle(
                 overflow: TextOverflow.clip,
                 color: AppConstantsColors.blackColor,
@@ -98,17 +131,16 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: TextFormField(
-                    enabled : false,
-                    controller: _nameController,
+                    controller: _titleController,
                     cursorColor: Colors.black,
                     keyboardType: TextInputType.text,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                      hintText: "Full Name",
+                      hintText: "Title of the Event",
                       hintStyle: TextStyle(
-                        color: Colors.black,
+                        color: Colors.grey,
                         fontSize: 16,
                       ),
                       prefixIcon: Icon(
@@ -118,7 +150,7 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your name';
+                        return 'Please enter your title';
                       }
                       return null;
                     },
@@ -137,8 +169,6 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: TextFormField(
-                    enabled : false,
-
                     controller: _mobilenoController,
                     cursorColor: Colors.black,
                     keyboardType: TextInputType.number,
@@ -148,7 +178,7 @@ class _BookPickupFormState extends State<BookPickupForm> {
                           EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                       hintText: 'Contact Number',
                       hintStyle: TextStyle(
-                        color: Colors.black,
+                        color: Colors.grey,
                         fontSize: 16,
                       ),
                       prefixIcon: Icon(
@@ -221,7 +251,7 @@ class _BookPickupFormState extends State<BookPickupForm> {
                       border: InputBorder.none,
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                      hintText: 'Pickup Date',
+                      hintText: 'Event Date',
                       hintStyle: TextStyle(
                         color: Colors.grey,
                         fontSize: 16,
@@ -270,7 +300,7 @@ class _BookPickupFormState extends State<BookPickupForm> {
                       border: InputBorder.none,
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                      hintText: 'Pickup Time',
+                      hintText: 'Event Time',
                       hintStyle: TextStyle(
                         color: Colors.grey,
                         fontSize: 16,
@@ -282,7 +312,7 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "Please enter your full Address";
+                        return "Please enter Event Time";
                       }
                       return null;
                     },
@@ -300,26 +330,65 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: TextFormField(
-                    controller: _quantityController,
+                    controller: _skillsController,
                     cursorColor: Colors.black,
                     keyboardType: TextInputType.text,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                      hintText: 'Weights in KG',
+                      hintText: 'Skills required for the Event',
                       hintStyle: TextStyle(
                         color: Colors.grey,
                         fontSize: 16,
                       ),
                       prefixIcon: Icon(
-                        Icons.numbers,
+                        Icons.work,
                         color: Colors.grey,
                       ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "Please enter quantity";
+                        return "Please enter skills";
+                      }
+                      return null;
+                    },
+                    // onSaved: (value) {
+                    //   _quantity = value!;
+                    // },
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  height: 150,
+                  width: MediaQuery.of(context).size.width / 1.12,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: TextFormField(
+                    controller: _descriptionController,
+                    focusNode: _descriptionFocus,
+                    cursorColor: Colors.black,
+                    keyboardType: TextInputType.text,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                      hintText: 'Description of the event',
+                      hintStyle: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 16,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.description,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter Description";
                       }
                       return null;
                     },
@@ -336,96 +405,82 @@ class _BookPickupFormState extends State<BookPickupForm> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppConstantsColors.accentColor,
                     ),
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-
-                          _formKey.currentState!.save();
-                          Map<String, dynamic> data = {
-                                                "name": _nameController.text,
-                                                "mobile": _mobilenoController.text,
-                                                "location": _locationController.text,
-                                                "pickupDate": _dateinputController.text,
-                                                "pickupTime": _timeinputController.text,
-                                                "quantity": _quantityController.text,
-                                                "order_open" : true,
-                                                "userId" : FirebaseAuth.instance.currentUser!.uid,
-                          };
-                          String currentUserUID = FirebaseAuth.instance.currentUser!.uid;
-                          try {
-                                FirebaseFirestore.instance
-                                .collection('pickupInfo')
-                                .add(data)
-                                .then((DocumentReference<Map<String, dynamic>> docRef) async {
-                              String pickupInfoID = docRef.id;
-
-                              // Update the Users collection with the pickupInfo data and ID
-                              await FirebaseFirestore.instance
-                                  .collection('Users')
-                                  .doc(currentUserUID)
-                                  .update({
-                                "pickupInfo": FieldValue.arrayUnion([pickupInfoID]),
-                              });
-                              // Navigate to the SuccessPage
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SuccessPage(),
-                                ),
-                              );
-
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Success'),
-                                    content: const Text("Successfully saved data"),
-                                    actions: [
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppConstantsColors.accentColor,
-                                        ),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text('OK'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            });
-
-                          } catch (error) {
-                            // Handle errors, if any
-                            String errorMessage =
-                            "Error updating Users collection: $error";
-                            // ignore: use_build_context_synchronously
-                            showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Error'),
-                              content: Text(errorMessage),
-                              actions: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppConstantsColors.accentColor,
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        Map<String, dynamic> data = {
+                          "title": _titleController.text,
+                          "mobile": _mobilenoController.text,
+                          "location": _locationController.text,
+                          "eventDate": _dateinputController.text,
+                          "eventTime": _timeinputController.text,
+                          "skills": _skillsController.text,
+                          "description": _descriptionController.text,
+                        };
+                        try {
+                          await FirebaseFirestore.instance
+                              .collection('UpcomingEvents')
+                              .add(data);
+                           _titleController.clear();
+                          _mobilenoController.clear();
+                          _locationController.clear();
+                          _dateinputController.clear();
+                          _timeinputController.clear();
+                          _skillsController.clear();
+                          _descriptionController.clear();
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Success'),
+                                content: const Text('Data saved successfully!'),
+                                actions: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppConstantsColors.accentColor,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('OK'),
                                   ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
- 
-                          }
+                                ],
+                              );
+                            },
+                          );
+                      } catch (error) {
+                          // Handle errors, if any
+                          String errorMessage =
+                              "Error updating Users collection: $error";
                           // ignore: use_build_context_synchronously
-                                                 }
-                      },
-                    child:  const Text('Submit',),
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Error'),
+                                content: Text(errorMessage),
+                                actions: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          AppConstantsColors.accentColor,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                        // ignore: use_build_context_synchronously
+                      }
+                    },
+                    child: const Text(
+                      'Submit',
+                    ),
                   ),
                 ),
                 //Row

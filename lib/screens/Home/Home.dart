@@ -7,6 +7,7 @@ import 'package:utkarsh/screens/LandingScreen.dart';
 import 'package:utkarsh/screens/Profile/profile.dart';
 import 'package:utkarsh/screens/book%20a%20pickup/BookPickup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:utkarsh/screens/volunteeres%20registration/Volunteer_Reegistration_Home.dart';
 import '../../widgets/HomeTileWidgets.dart';
 import '../../widgets/Menubar/MenuBar.dart';
 class HomePage extends StatelessWidget {
@@ -40,10 +41,10 @@ class HomePage extends StatelessWidget {
                 },
               ),
               ListTile(
-                title: const Text('Event Calendar'),
+                title: const Text('Volunteer Registration'),
                 onTap: () {
-                  // Navigator.of(context).push(MaterialPageRoute(
-                  //     builder: (context) =>  CalendarScreen()));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>  const VolunteerRegistrationHome()));
                   // Update the state of the app.
                   // ...
                 },

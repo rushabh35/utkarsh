@@ -1,23 +1,22 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:multi_image_picker_view/multi_image_picker_view.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:utkarsh/constants/app_constants_colors.dart';
+import 'package:utkarsh/screens/AdminSide/Event%20Registration/event_add.dart';
 import 'package:utkarsh/screens/LandingScreen.dart';
 import 'package:utkarsh/utils/ui/CustomButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class AdminHome extends StatefulWidget {
-  const AdminHome({Key? key}) : super(key: key);
+class AdminBookAPickup extends StatefulWidget {
+  const AdminBookAPickup({Key? key}) : super(key: key);
 
   @override
-  State<AdminHome> createState() => _AdminHomeState();
+  State<AdminBookAPickup> createState() => _AdminBookAPickupState();
 }
 
-class _AdminHomeState extends State<AdminHome> {
+class _AdminBookAPickupState extends State<AdminBookAPickup> {
   List<File> selectedImages = [];
   final picker = ImagePicker();
   Future getImages() async {
@@ -84,6 +83,15 @@ class _AdminHomeState extends State<AdminHome> {
               ),
               child: Text('Admin Side Drawer'),
             ),
+            ListTile(
+              title: const Text('Event Registration'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.of(context).pop();
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const EventAdd()));
+              },
+            ),   
             const Divider(),
             ListTile(
               title: const Text('Log Out'),
@@ -196,14 +204,6 @@ class _AdminHomeState extends State<AdminHome> {
                                 onPressed: () async {
                                   await getImages();
                                   _uploadImages(snapshot.data!.docs[i].id);
-                                  // await getImages();
-                                  // await _uploadImages(snapshot.data!.docs[i].id);
-                                  // FirebaseFirestore.instance
-                                  //     .collection('pickupInfo')
-                                  //     .doc(snapshot.data!.docs[i].id)
-                                  //     .update({
-                                  // 'images': FieldValue.arrayUnion(selectedImages),
-                                  // });
                                 },
                               ),
                           ],
@@ -224,3 +224,5 @@ class _AdminHomeState extends State<AdminHome> {
     );
   }
 }
+
+  

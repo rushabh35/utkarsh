@@ -19,6 +19,7 @@ class UserRepository extends GetxController {
           backgroundColor: Colors.green,
           colorText: Colors.white),
         )
+        // ignore: invalid_return_type_for_catch_error
         .catchError((e, stackTrace) => {
           Get.snackbar(
             "Error",
