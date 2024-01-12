@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:utkarsh/services/auth.dart';
 import '../../constants/app_constants_colors.dart';
 import '../../utils/ui/ClickableText.dart';
 import '../../utils/ui/CustomBoldText.dart';
@@ -9,6 +10,7 @@ import '../../widgets/LoginTextField.dart';
 import '../../widgets/PasswordTextField.dart';
 import '../Home/Navbar.dart';
 import 'UserSignUpPage.dart';
+import 'package:provider/provider.dart';
 
 class UserSignIn extends StatefulWidget {
   const UserSignIn({Key? key}) : super(key: key);
@@ -24,6 +26,8 @@ class _UserSignInState extends State<UserSignIn> {
   // SharedPreferences? prefs;
   @override
   Widget build(BuildContext context) {
+    final AuthenticationServices _userAuthService =
+        Provider.of<AuthenticationServices>(context);
     var size = MediaQuery.of(context).size;
     var sizeHeight = size.height;
     var sizeWidth = size.width;
@@ -46,7 +50,6 @@ class _UserSignInState extends State<UserSignIn> {
               controller: _emailController,
               hintText: 'Email',
               errorText: _isNotValid ? "Enter Email Field" : null,
-              
             ),
 
             PasswordTextField(
@@ -72,46 +75,49 @@ class _UserSignInState extends State<UserSignIn> {
                     setState(() {
                       _isNotValid = false;
                     }),
-                      FirebaseAuth.instance
-                          .signInWithEmailAndPassword(
-                              email: _emailController.text,
-                              password: _passWordController.text)
-                          .then((value) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const BottomNavBar()),
-                        );
-                      }).catchError((error) {
-                        String errorMessage =
-                            "An error occurred wrong email or incorrect password";
-                        if (error.code == 'user-not-found') {
-                          errorMessage = 'No user found for that email.';
-                        } else if (error.code == 'wrong-password') {
-                          errorMessage = 'Wrong password provided.';
-                        }
-                        // Display error message in the UI
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Login Error'),
-                              content: Text(errorMessage),
-                              actions: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppConstantsColors.accentColor,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('OK'),
+                    _userAuthService
+                        .signIn(
+                      email: _emailController.text,
+                      password: _passWordController.text,
+                    )
+                        .then((value) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const BottomNavBar
+                            ()),
+                      );
+                    }).catchError((error) {
+                      String errorMessage =
+                          "An error occurred wrong email or incorrect password";
+                      if (error.code == 'user-not-found') {
+                        errorMessage = 'No user found for that email.';
+                      } else if (error.code == 'wrong-password') {
+                        errorMessage = 'Wrong password provided.';
+                      }
+                      // Display error message in the UI
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Login Error'),
+                            content: Text(errorMessage),
+                            actions: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      AppConstantsColors.accentColor,
                                 ),
-                              ],
-                            );
-                          },
-                        );
-                      }),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }),
                   },
               },
               width: sizeWidth * 0.92,

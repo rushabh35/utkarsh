@@ -3,44 +3,31 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:utkarsh/services/sharedPrefServices.dart';
 
-class AuthenticationServices {
-  final FirebaseAuth _firebaseAuthUser;
+class NGOAuthServices {
+  final FirebaseAuth _firebaseAuthNGO;
 
   CollectionReference _collectionReference =
-      FirebaseFirestore.instance.collection('Users');
+      FirebaseFirestore.instance.collection('NGO');
 
-  AuthenticationServices(this._firebaseAuthUser);
+  NGOAuthServices(this._firebaseAuthNGO);
 
-  Stream<User?> get authStateChanged => _firebaseAuthUser.authStateChanges();
+  Stream<User?> get authStateChanged => _firebaseAuthNGO.authStateChanges();
 
   Future<void> signOut() async {
-    await _firebaseAuthUser.signOut();
+    await _firebaseAuthNGO.signOut();
     await clearPrefs();
   }
 
   //sign in with email and password
   Future signIn({required String email, required String password}) async {
     try {
-      await _firebaseAuthUser.signInWithEmailAndPassword(
+      await _firebaseAuthNGO.signInWithEmailAndPassword(
           email: email, password: password);
       return "Signed In";
     } on FirebaseAuthException catch (e) {
       return e.message;
     }
   }
-
-  //register with email and password
-  // Future registerWithEmailAndPassword(String email, String password) async {
-  //   try {
-  //     UserCredential result = await _firebaseAuthUser
-  //         .createUserWithEmailAndPassword(email: email, password: password);
-  //     User? user = result.user;
-  //     return user;
-  //   } catch (e) {
-  //     print(e.toString());
-  //     return null;
-  //   }
-  // }
 
   //sign out
   Future<String> signUp({
@@ -50,12 +37,12 @@ class AuthenticationServices {
     required String password,
   }) async {
     try {
-      await _firebaseAuthUser.createUserWithEmailAndPassword(
+      await _firebaseAuthNGO.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      User? user = _firebaseAuthUser.currentUser;
+      User? user = _firebaseAuthNGO.currentUser;
       String? uid = user?.uid;
 
       await _collectionReference.doc(uid).set({

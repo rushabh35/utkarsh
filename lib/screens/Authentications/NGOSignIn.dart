@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:utkarsh/screens/Authentications/NGOSignUp.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:utkarsh/screens/Home/Navbar.dart';
+import 'package:utkarsh/screens/NGOScreens/NgoHome.dart';
+import 'package:utkarsh/services/ngo_auth.dart';
 import '../../constants/app_constants_colors.dart';
 import '../../utils/ui/ClickableText.dart';
 import '../../utils/ui/CustomBoldText.dart';
@@ -10,9 +12,9 @@ import '../../utils/ui/CustomTextWidget.dart';
 import '../../widgets/LoginTextField.dart';
 import '../../widgets/PasswordTextField.dart';
 import 'UserSignUpPage.dart';
+import 'package:provider/provider.dart';
 
 class NGOSignIn extends StatefulWidget {
-
   const NGOSignIn({Key? key}) : super(key: key);
 
   @override
@@ -26,6 +28,9 @@ class _NGOSignInState extends State<NGOSignIn> {
   // SharedPreferences? prefs;
   @override
   Widget build(BuildContext context) {
+    final NGOAuthServices _ngoAuthService =
+        Provider.of<NGOAuthServices>(context);
+
     var size = MediaQuery.of(context).size;
     var sizeHeight = size.height;
     var sizeWidth = size.width;
@@ -41,39 +46,73 @@ class _NGOSignInState extends State<NGOSignIn> {
             CustomBoldText(
               text: 'NGO Sign In',
               fontSize: sizeHeight * 0.06,
-              textColor: AppConstantsColors.accentColor   ,
+              textColor: AppConstantsColors.accentColor,
             ),
 
             LoginTextFieldWidget(
-              controller: _emailController, hintText: 'NGO Email', errorText : _isNotValid ? "Enter Email Field" : null,),
+              controller: _emailController,
+              hintText: 'NGO Email',
+              errorText: _isNotValid ? "Enter Email Field" : null,
+            ),
 
-            PasswordTextField(controller: _passWordController, hintText: 'Password', errorText : _isNotValid ? "Enter password Field" : null,),
-
+            PasswordTextField(
+              controller: _passWordController,
+              hintText: 'Password',
+              errorText: _isNotValid ? "Enter password Field" : null,
+            ),
 
             CustomButton(
               buttonColor: AppConstantsColors.accentColor,
-
               text: 'NGO SIGN IN',
               onPressed: () {
-                FirebaseAuth.instance.
-                signInWithEmailAndPassword(
+                if (_emailController.text.isEmpty ||
+                    _passWordController.text.isEmpty) {
+                  setState(() {
+                    _isNotValid = true;
+                  });
+                } else {
+                  setState(() {
+                    _isNotValid = false;
+                  });
+                  _ngoAuthService.signIn(
                     email: _emailController.text,
-                    password: _passWordController.text).
-                then((value){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => BottomNavBar()),
-                  );
-                }).onError((error,stackTrace) {
-                  print("Error ${error.toString()})");
-                });
-
-                // loginUser();
-                // try {
-                //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => const LandingPage()));
-                // } catch (e) {
-                //   print("Navigation error: $e");
-                // }
+                    password: _passWordController.text,
+                  ).then((value) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const NGOHome()),
+                    );
+                  }).catchError((error) {
+                    String errorMessage =
+                        "An error occurred wrong email or incorrect password";
+                    if (error.code == 'user-not-found') {
+                      errorMessage = 'No user found for that email.';
+                    } else if (error.code == 'wrong-password') {
+                      errorMessage = 'Wrong password provided.';
+                    }
+                    // Display error message in the UI
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Login Error'),
+                          content: Text(errorMessage),
+                          actions: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppConstantsColors.accentColor,
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  });
+                }
               },
               width: sizeWidth * 0.92,
               height: sizeHeight * 0.06,
@@ -104,26 +143,18 @@ class _NGOSignInState extends State<NGOSignIn> {
               children: [
                 const CustomTextWidget(
                     text: 'Dont have an account? ',
-                    textColor: AppConstantsColors.blackColor
-
-                ),
+                    textColor: AppConstantsColors.blackColor),
                 ClickableText(
-                  text : 'Sign Up',
-                  textColor : AppConstantsColors.redColor,
-                  fontSize : 14,
+                  text: 'Sign Up',
+                  textColor: AppConstantsColors.redColor,
+                  fontSize: 14,
                   onPressed: () {
-                    Navigator
-                        .of(context).push(MaterialPageRoute(
-                        builder: (context) => const NGOSignUp()
-                    )
-                    );
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const NGOSignUp()));
                   },
                 )
               ],
             )
-
-
-
           ],
         ),
       ),

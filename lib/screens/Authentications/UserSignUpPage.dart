@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:utkarsh/services/auth.dart';
 import 'package:utkarsh/widgets/TextFieldWidget.dart';
@@ -12,7 +10,6 @@ import '../../utils/ui/CustomBoldText.dart';
 import '../../widgets/LoginTextField.dart';
 import '../Home/Navbar.dart';
 import 'UsersSignIn.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -126,6 +123,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   } catch(e){
                     debugPrint(e.toString());
                   }
+
                   // _register(),
                   // if (_emailController.text.isEmpty ||
                   //     _passWordController.text.isEmpty)

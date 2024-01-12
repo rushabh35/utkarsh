@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:utkarsh/constants/app_constants_colors.dart';
 import 'package:utkarsh/screens/Authentications/UsersSignIn.dart';
+import 'package:utkarsh/screens/Donations/donations_home.dart';
 import 'package:utkarsh/screens/LandingScreen.dart';
 import 'package:utkarsh/screens/Profile/profile.dart';
 import 'package:utkarsh/screens/book%20a%20pickup/BookPickup.dart';
@@ -45,6 +46,15 @@ class HomePage extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) =>  const VolunteerRegistrationHome()));
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+              ListTile(
+                title: const Text('Donations'),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>  const DonationsHome()));
                   // Update the state of the app.
                   // ...
                 },
